@@ -1,8 +1,8 @@
-f451bdcb276f9761fef0a66ccffd3cf8 *DESCRIPTION
+b05c93d596772e0f1df23b5730efcaa5 *DESCRIPTION
 e45b53744c9813be1320f09112c62e43 *NAMESPACE
 3774b47f3f99ad4e052f06887697af93 *R/RcppExports.R
-77ae1b43272a8e7abd7bc107b1624ff0 *R/add_image_overlay.R
-c0de281ff05c961d5a7148d6f9d4510e *R/add_title.R
+24eb00dab0a3b791864765d2866d1ba5 *R/add_image_overlay.R
+1622a8d0bd55411e62c4bcbbc49d309a *R/add_title.R
 f01dd57b24a9480d21d8f8d964df5386 *R/add_vignette.R
 a19e4da61d200aaa08e4515aea9e67b0 *R/calc_bokeh_size.R
 91be58a185547b9e53898001f83e19ca *R/data.R
@@ -23,8 +23,8 @@ e0a57903d33c3fa652ce53be0d5eaaca *R/render_reorient.R
 65cef5e0674056f6fc07dd2b3ca85c13 *R/utils-pipe.R
 6a7156a4ee7ce92ed67a053c0a86fa6a *data/dragon.rda
 f3f3afa22818e9db791c495188536462 *data/dragondepth.rda
-f80665778d88e8182f40bd0ed6987557 *man/add_image_overlay.Rd
-5c376d6ec88054087ad43588e5110606 *man/add_title.Rd
+714a58db87958712b59b5e1f68b1ab9e *man/add_image_overlay.Rd
+89b1d72aac3c2c26448be097f66506f1 *man/add_title.Rd
 a126a38884c1369373930b1966acd7e2 *man/add_vignette.Rd
 ee879961cc2c336358ed507cf5de7daa *man/calc_bokeh_size.Rd
 99f802088524e77c22268331bd869dfd *man/dragon.Rd
