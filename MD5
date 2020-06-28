@@ -1,7 +1,7 @@
-db8e8314969e8d57664aa5ed74600f80 *DESCRIPTION
+ac5ae16dd51391f33177382942d2e2c6 *DESCRIPTION
 7edb776ddbf62d6f4065003c28667659 *NAMESPACE
-2e449a74cfb0726a0496507ef895b277 *R/RcppExports.R
-24eb00dab0a3b791864765d2866d1ba5 *R/add_image_overlay.R
+802f4fba282fee96f64322f896bd579f *R/RcppExports.R
+1c594ca8a0c12a71f831d4c6da33f927 *R/add_image_overlay.R
 1622a8d0bd55411e62c4bcbbc49d309a *R/add_title.R
 f01dd57b24a9480d21d8f8d964df5386 *R/add_vignette.R
 1fa62e1228f0c804bb17d24d62d87c54 *R/calc_bokeh_size.R
@@ -19,12 +19,12 @@ dcb71a73aae666db1e1bec0d2c259959 *R/rayimageRcpp.R
 d3b2d7388d820d0fd03978677193fbd1 *R/render_bokeh.R
 9d115169388d05acd74fa6e0a3a59acd *R/render_convolution.R
 e0a57903d33c3fa652ce53be0d5eaaca *R/render_reorient.R
-5dae55a863cf663b7ceba71f5f95b37c *R/render_resized.R
+a37ceafb3d8b37cc6bba02065bf56138 *R/render_resized.R
 273acbc20d2254b53b1f766518e810fb *R/save_png.R
 65cef5e0674056f6fc07dd2b3ca85c13 *R/utils-pipe.R
 6a7156a4ee7ce92ed67a053c0a86fa6a *data/dragon.rda
 f3f3afa22818e9db791c495188536462 *data/dragondepth.rda
-714a58db87958712b59b5e1f68b1ab9e *man/add_image_overlay.Rd
+e9cb8818e50c4dd9446cb841fc015ee8 *man/add_image_overlay.Rd
 89b1d72aac3c2c26448be097f66506f1 *man/add_title.Rd
 a126a38884c1369373930b1966acd7e2 *man/add_vignette.Rd
 c4e56e570166f9e2bb88d5bdc74f8c28 *man/calc_bokeh_size.Rd
@@ -46,5 +46,5 @@ f3e57dc383aaf63ae679618efdfacab9 *man/interpolate_array.Rd
 e524eef279d5169f5adafa1309823caf *man/render_reorient.Rd
 ecac28efc82ea4ad4171ec9db8e14258 *man/render_resized.Rd
 f6851b8556fc9fc05a9c55a04ca27184 *man/save_png.Rd
-015868ff2f5f12e594fb30b9f96aebf7 *src/RcppExports.cpp
-62b6afa10493919689e1d1222a8a7d82 *src/pointspread.cpp
+d4c15cec8a23178dc48df2b36d88f632 *src/RcppExports.cpp
+ffa06a582653e58c92c3b4708adbd7a9 *src/pointspread.cpp
