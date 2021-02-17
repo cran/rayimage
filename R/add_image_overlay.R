@@ -40,14 +40,18 @@
 add_image_overlay = function(image, image_overlay = NULL, rescale_original = FALSE,
                              alpha = NULL, filename = NULL, preview = FALSE) {
   imagetype = get_file_type(image)
+  image_overlay_type = get_file_type(image)
+
   temp = tempfile(fileext = ".png")
+  temp_overlay = tempfile(fileext = ".png")
+
   if(imagetype == "array") {
     #Clip HDR images
     image[image > 1] = 1
     png::writePNG(image,temp)
     image = temp
   } else if (imagetype == "matrix") {
-    newarray = array(0,dim=c(nrow(image),ncol(image),3))
+    newarray = array(1,dim=c(nrow(image),ncol(image),4))
     newarray[,,1] = image
     newarray[,,2] = image
     newarray[,,3] = image
@@ -62,7 +66,29 @@ add_image_overlay = function(image, image_overlay = NULL, rescale_original = FAL
     image = jpeg::readJPEG(image)
     png::writePNG(image,temp)
   }
+  if(image_overlay_type == "array") {
+    #Clip HDR images
+    image_overlay[image_overlay > 1] = 1
+    png::writePNG(image_overlay,temp_overlay)
+    image_overlay = temp_overlay
+  } else if (image_overlay_type == "matrix") {
+    newarray = array(1,dim=c(nrow(image_overlay),ncol(image_overlay),4))
+    newarray[,,1] = image_overlay
+    newarray[,,2] = image_overlay
+    newarray[,,3] = image_overlay
+    #Clip HDR images
+    newarray[newarray > 1] = 1
+    png::writePNG(newarray,temp_overlay)
+    image_overlay = temp_overlay
+  } else if (image_overlay_type == "png") {
+    image_overlay = png::readPNG(image_overlay)
+    png::writePNG(image_overlay,temp_overlay)
+  } else if (image_overlay_type == "jpg") {
+    image_overlay = jpeg::readJPEG(image_overlay)
+    png::writePNG(image_overlay,temp_overlay)
+  }
   tempmap = aperm(png::readPNG(temp),c(2,1,3))
+
   dimensions = dim(tempmap)
 
   if(!("magick" %in% rownames(utils::installed.packages()))) {
@@ -89,9 +115,18 @@ add_image_overlay = function(image, image_overlay = NULL, rescale_original = FAL
         stop("alpha needs to be between 0 and 1")
       }
     }
+    if(length(dim(image_overlay)) == 2 && !is.null(alpha)) {
+      newarray = array(alpha,dim = c(dim(image_overlay),4))
+      if(alpha >= 0 && alpha <= 1) {
+        newarray[,,1:3] = tempover
+        image_overlay = newarray
+      } else {
+        stop("alpha needs to be between 0 and 1")
+      }
+    }
     image_overlay_file = tempfile(fileext = ".png")
     png::writePNG(tempover, image_overlay_file)
-  } else if(inherits(image_overlay,"array")) {
+  } else if(inherits(image_overlay,"array") || inherits(image_overlay,"matrix")) {
     if(length(dim(image_overlay)) == 3 && dim(image_overlay)[3] == 4 && !is.null(alpha)) {
       if(alpha >= 0 && alpha <= 1) {
         image_overlay[,,4] = image_overlay[,,4] * alpha
@@ -108,34 +143,51 @@ add_image_overlay = function(image, image_overlay = NULL, rescale_original = FAL
         stop("alpha needs to be between 0 and 1")
       }
     }
+    if(length(dim(image_overlay)) == 2 && !is.null(alpha)) {
+      newarray = array(alpha,dim = c(dim(image_overlay),4))
+      if(alpha >= 0 && alpha <= 1) {
+        newarray[,,1:3] = image_overlay
+        image_overlay = newarray
+      } else {
+        stop("alpha needs to be between 0 and 1")
+      }
+    }
     image_overlay_file = tempfile()
     png::writePNG(image_overlay, image_overlay_file)
   }
-  tempover = aperm(png::readPNG(image_overlay_file),c(2,1,3))
+  tempover = png::readPNG(image_overlay_file)
+  if(length(dim(tempover)) == 3) {
+    tempover = aperm(tempover, c(2,1,3))
+  } else {
+    temparray = array(1,dim=c(dim(tempover),4))
+    temparray[,,1:3] = tempover
+    tempover = aperm(temparray, c(2,1,3))
+  }
   dimensions_overlay = dim(tempover)
   if(!rescale_original) {
     magick::image_read(temp) %>%
       magick::image_composite(
         magick::image_scale(magick::image_read(image_overlay_file),
-                            paste0(dimensions[1],"x",dimensions[2],"!"))
+                            paste0(dimensions[1],"x",dimensions[2],"!")), operator = "Over"
       ) %>%
       magick::image_write(path = temp, format = "png")
   } else {
     magick::image_read(temp) %>%
       magick::image_scale(paste0(dimensions_overlay[1],"x",dimensions_overlay[2],"!")) %>%
-      magick::image_composite(magick::image_read(image_overlay_file)) %>%
+      magick::image_composite(magick::image_read(image_overlay_file), operator = "Over") %>%
       magick::image_write(path = temp, format = "png")
   }
   temp = png::readPNG(temp)
   if(length(dim(temp)) == 3 && dim(temp)[3] == 2) {
-    temparray = array(0,dim = c(nrow(temp),ncol(temp),3))
+    temparray = array(1,dim = c(nrow(temp),ncol(temp),4))
     temparray[,,1] = temp[,,1]
     temparray[,,2] = temp[,,1]
     temparray[,,3] = temp[,,1]
+    temparray[,,4] = temp[,,2]
     temp = temparray
   }
   if(length(dim(temp)) == 2) {
-    temparray = array(0,dim = c(nrow(temp),ncol(temp),3))
+    temparray = array(1,dim = c(nrow(temp),ncol(temp),4))
     temparray[,,1] = temp
     temparray[,,2] = temp
     temparray[,,3] = temp

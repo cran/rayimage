@@ -6,6 +6,17 @@
 
 using namespace Rcpp;
 
+// get_boolean_distance
+NumericMatrix get_boolean_distance(LogicalMatrix input);
+RcppExport SEXP _rayimage_get_boolean_distance(SEXP inputSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< LogicalMatrix >::type input(inputSEXP);
+    rcpp_result_gen = Rcpp::wrap(get_boolean_distance(input));
+    return rcpp_result_gen;
+END_RCPP
+}
 // subsample
 arma::mat subsample(arma::mat& circle, int size);
 RcppExport SEXP _rayimage_subsample(SEXP circleSEXP, SEXP sizeSEXP) {
@@ -57,14 +68,16 @@ BEGIN_RCPP
 END_RCPP
 }
 // generate_disk
-arma::mat generate_disk(float radius, int dim);
-RcppExport SEXP _rayimage_generate_disk(SEXP radiusSEXP, SEXP dimSEXP) {
+arma::mat generate_disk(float radius, int dim, bool offsetx, bool offsety);
+RcppExport SEXP _rayimage_generate_disk(SEXP radiusSEXP, SEXP dimSEXP, SEXP offsetxSEXP, SEXP offsetySEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< float >::type radius(radiusSEXP);
     Rcpp::traits::input_parameter< int >::type dim(dimSEXP);
-    rcpp_result_gen = Rcpp::wrap(generate_disk(radius, dim));
+    Rcpp::traits::input_parameter< bool >::type offsetx(offsetxSEXP);
+    Rcpp::traits::input_parameter< bool >::type offsety(offsetySEXP);
+    rcpp_result_gen = Rcpp::wrap(generate_disk(radius, dim, offsetx, offsety));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -170,11 +183,12 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_rayimage_get_boolean_distance", (DL_FUNC) &_rayimage_get_boolean_distance, 1},
     {"_rayimage_subsample", (DL_FUNC) &_rayimage_subsample, 2},
     {"_rayimage_rayinterp2", (DL_FUNC) &_rayimage_rayinterp2, 3},
     {"_rayimage_resize_image", (DL_FUNC) &_rayimage_resize_image, 2},
     {"_rayimage_resize_image_xy", (DL_FUNC) &_rayimage_resize_image_xy, 3},
-    {"_rayimage_generate_disk", (DL_FUNC) &_rayimage_generate_disk, 2},
+    {"_rayimage_generate_disk", (DL_FUNC) &_rayimage_generate_disk, 4},
     {"_rayimage_gen_ellipse", (DL_FUNC) &_rayimage_gen_ellipse, 3},
     {"_rayimage_subsample_rect", (DL_FUNC) &_rayimage_subsample_rect, 3},
     {"_rayimage_gen_circle_psf", (DL_FUNC) &_rayimage_gen_circle_psf, 1},
