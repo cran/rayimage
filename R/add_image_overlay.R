@@ -19,6 +19,7 @@
 #'@import grDevices
 #'@export
 #'@examples
+#'if(interactive()){
 #'#Plot the dragon
 #'plot_image(dragon)
 #'
@@ -36,6 +37,7 @@
 #'\donttest{
 #'add_image_overlay(dragon_clipped, image_overlay = rgba_array,
 #'                  alpha=0.5, preview = TRUE)
+#'}
 #'}
 add_image_overlay = function(image, image_overlay = NULL, rescale_original = FALSE,
                              alpha = NULL, filename = NULL, preview = FALSE) {

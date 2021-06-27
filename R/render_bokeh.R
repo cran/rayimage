@@ -6,7 +6,7 @@
 #'
 #'@param image Image filename or 3-layer RGB array.
 #'@param depthmap Depth map filename or 1d array.
-#'@param focus Defaults `0.5`. Depth in which to blur. Minimum 0, maximum 1.
+#'@param focus Defaults `0.5`. Depth in which to blur.
 #'@param focallength Default `100`. Focal length of the virtual camera.
 #'@param fstop Default `4`. F-stop of the virtual camera.
 #'@param filename Default `NULL`. The filename of the image to be saved. If this is not given, the image will be plotted instead.
@@ -24,6 +24,7 @@
 #'@return 3-layer RGB array of the processed image.
 #'@export
 #'@examples
+#'if(interactive()){
 #'#Plot the dragon
 #'plot_image(dragon)
 #'
@@ -63,6 +64,7 @@
 #'\donttest{
 #'render_bokeh(dragon, dragondepth, bokehshape = "hex", rotation=15,
 #'             focallength=300, focus=600)
+#'}
 #'}
 render_bokeh = function(image, depthmap,
                         focus=0.5, focallength = 100, fstop = 4, filename=NULL,
@@ -119,10 +121,12 @@ render_bokeh = function(image, depthmap,
   }
 
   depthmap[is.na(depthmap)] = max(depthmap, na.rm = TRUE)*2
+  depthmap = t((depthmap))
   if(gamma_correction) {
     temp_image = temp_image^2.2
   }
   for(i in 1:3) {
+    max_size = min(c(max(dim(depthmap)),500))
     if(i == 1) {
       depthmap2 = calc_bokeh_size(depthmap,focus,focallength, fstop,1+aberration)
     } else if(i ==2) {
@@ -130,9 +134,10 @@ render_bokeh = function(image, depthmap,
     } else {
       depthmap2 = calc_bokeh_size(depthmap,focus,focallength, fstop,1-aberration)
     }
-    temp_image[,,i] = flipud(t(psf(t(flipud(temp_image[,,i])),depthmap2,
+    depthmap2[depthmap2 > max_size] = max_size
+    temp_image[,,i] = psf(temp_image[,,i],depthmap2,
                                 depthmap, focus, bokehshape, custombokeh = custombokeh,
-                                bokehintensity, bokehlimit, rotation, progbar = progress,channel = i)))
+                                bokehintensity, bokehlimit, rotation, progbar = progress,channel = i)
   }
   if(gamma_correction) {
     temp_image = temp_image ^ (1/2.2)

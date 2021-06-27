@@ -27,6 +27,7 @@ to returning it.}
 Takes an RGB array/filename and adds a camera vignette effect.
 }
 \examples{
+if(interactive()){
 #Plot the dragon
 plot_image(dragon)
 
@@ -42,5 +43,6 @@ add_vignette(dragon, preview = TRUE, vignette = 1)
 #Increase the width of the blur by 50\%:
 \donttest{
 add_vignette(dragon, preview = TRUE, vignette = c(1,1.5))
+}
 }
 }

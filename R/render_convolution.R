@@ -24,6 +24,7 @@
 #'@return 3-layer RGB array of the processed image.
 #'@export
 #'@examples
+#'if(interactive()){
 #'#Perform a convolution with the default gaussian kernel
 #'
 #'plot_image(dragon)
@@ -76,6 +77,7 @@
 #'\donttest{
 #'plot_image(custom)
 #'render_convolution(dragon, kernel = custom, preview = TRUE)
+#'}
 #'}
 render_convolution = function(image, kernel = "gaussian",
                               kernel_dim = 11, kernel_extent = 3, absolute = TRUE,

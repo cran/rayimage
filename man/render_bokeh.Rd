@@ -27,7 +27,7 @@ render_bokeh(
 
 \item{depthmap}{Depth map filename or 1d array.}
 
-\item{focus}{Defaults \code{0.5}. Depth in which to blur. Minimum 0, maximum 1.}
+\item{focus}{Defaults \code{0.5}. Depth in which to blur.}
 
 \item{focallength}{Default \code{100}. Focal length of the virtual camera.}
 
@@ -64,6 +64,7 @@ Takes an image and a depth map to render the image with depth of field
 or use one of the built-in bokeh types.
 }
 \examples{
+if(interactive()){
 #Plot the dragon
 plot_image(dragon)
 
@@ -103,5 +104,6 @@ render_bokeh(dragon, dragondepth,
 \donttest{
 render_bokeh(dragon, dragondepth, bokehshape = "hex", rotation=15,
             focallength=300, focus=600)
+}
 }
 }
