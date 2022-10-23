@@ -4,7 +4,14 @@
 \alias{make_vignette_overlay}
 \title{Make Vignette Overlay}
 \usage{
-make_vignette_overlay(width, height, intensity = 0.3, radius = NULL)
+make_vignette_overlay(
+  width,
+  height,
+  intensity = 0.3,
+  radius_multiplier = 1.3,
+  radius = NULL,
+  color = "#000000"
+)
 }
 \arguments{
 \item{width}{Width of the image.}
@@ -13,7 +20,11 @@ make_vignette_overlay(width, height, intensity = 0.3, radius = NULL)
 
 \item{intensity}{Default \code{0.4}. \code{1} is max intensity, \code{0} is min.}
 
+\item{radius_multiplier}{Default \code{1.3}.}
+
 \item{radius}{Default \code{NULL}. Max of height or width, divided by 2.}
+
+\item{color}{Default \code{black}.}
 }
 \description{
 Makes an overlay to simulate vignetting in a camera

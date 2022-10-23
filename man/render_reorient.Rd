@@ -33,7 +33,7 @@ render_reorient(
 Reorients an image or matrix. Transformations are applied in this order: x, y, and transpose.
 }
 \examples{
-if(interactive()){
+#if(interactive()){
 #Original orientation
 \donttest{
 plot_image(dragon)
@@ -59,5 +59,5 @@ dragon \%>\%
  render_reorient(transpose = TRUE) \%>\%
  plot_image()
 }
-}
+#end}
 }

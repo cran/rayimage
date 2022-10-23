@@ -11,7 +11,7 @@
 #'@return 3-layer RGB reoriented array or matrix.
 #'@export
 #'@examples
-#'if(interactive()){
+#'#if(interactive()){
 #'#Original orientation
 #'\donttest{
 #'plot_image(dragon)
@@ -37,7 +37,7 @@
 #'  render_reorient(transpose = TRUE) %>%
 #'  plot_image()
 #'}
-#'}
+#'#end}
 render_reorient = function(image, flipx = FALSE, flipy = FALSE, transpose = FALSE,
                            filename=NULL, preview=FALSE) {
   if(!is.null(filename)) {

@@ -54,7 +54,7 @@ of the kernel to only that overlapping the actual image (renormalizing the
 kernel for the edges).
 }
 \examples{
-if(interactive()){
+#if(interactive()){
 #Perform a convolution with the default gaussian kernel
 
 plot_image(dragon)
@@ -108,5 +108,5 @@ custom = diag(10) + (diag(10)[,10:1])
 plot_image(custom)
 render_convolution(dragon, kernel = custom, preview = TRUE)
 }
-}
+#end}
 }

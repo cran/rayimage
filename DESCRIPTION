@@ -1,7 +1,7 @@
 Package: rayimage
 Type: Package
 Title: Image Processing for Simulated Cameras
-Version: 0.6.2
+Version: 0.7.3
 Authors@R: c(person("Tyler", "Morgan-Wall", email = "tylermw@gmail.com", 
     role = c("aut", "cph", "cre"), comment = c(ORCID = "0000-0002-3131-3814")),
     person("Sean", "Barrett", role = c("ctb", "cph")))
@@ -10,17 +10,17 @@ Description: Uses convolution-based techniques to generate simulated camera boke
 License: GPL-3
 LazyData: true
 Depends: R (>= 3.0.2)
-Imports: Rcpp, png, magrittr, jpeg, grDevices
-Suggests: magick, raster
+Imports: Rcpp, png, magrittr, jpeg, grDevices, grid
+Suggests: magick
 LinkingTo: Rcpp, RcppArmadillo, progress
-RoxygenNote: 7.1.1
+RoxygenNote: 7.2.1
 URL: https://www.rayimage.dev,
         https://github.com/tylermorganwall/rayimage
 BugReports: https://github.com/tylermorganwall/rayimage/issues
 NeedsCompilation: yes
-Packaged: 2021-06-27 04:17:13 UTC; tyler
+Packaged: 2022-10-22 04:14:30 UTC; tyler
 Author: Tyler Morgan-Wall [aut, cph, cre]
     (<https://orcid.org/0000-0002-3131-3814>),
   Sean Barrett [ctb, cph]
 Repository: CRAN
-Date/Publication: 2021-06-27 16:30:01 UTC
+Date/Publication: 2022-10-23 03:22:35 UTC

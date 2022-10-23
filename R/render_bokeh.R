@@ -24,7 +24,7 @@
 #'@return 3-layer RGB array of the processed image.
 #'@export
 #'@examples
-#'if(interactive()){
+#'#if(interactive()){
 #'#Plot the dragon
 #'plot_image(dragon)
 #'
@@ -65,7 +65,7 @@
 #'render_bokeh(dragon, dragondepth, bokehshape = "hex", rotation=15,
 #'             focallength=300, focus=600)
 #'}
-#'}
+#'#end}
 render_bokeh = function(image, depthmap,
                         focus=0.5, focallength = 100, fstop = 4, filename=NULL,
                         preview = TRUE, preview_focus = FALSE,
