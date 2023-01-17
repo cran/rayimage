@@ -19,10 +19,11 @@
 #'@import grDevices
 #'@export
 #'@examples
-#'#if(interactive()){
+#'if(rayimage:::run_documentation()){
 #'#Plot the dragon
 #'plot_image(dragon)
-#'
+#'}
+#'if(rayimage:::run_documentation()){
 #'#Add an overlay of a red semi-transparent circle:
 #'circlemat = generate_2d_disk(min(dim(dragon)[1:2]))
 #'circlemat = circlemat/max(circlemat)
@@ -34,11 +35,9 @@
 #'rgba_array[,,3] = 0
 #'dragon_clipped = dragon
 #'dragon_clipped[dragon_clipped > 1] = 1
-#'\donttest{
 #'add_image_overlay(dragon_clipped, image_overlay = rgba_array,
 #'                  alpha=0.5, preview = TRUE)
 #'}
-#'#end}
 add_image_overlay = function(image, image_overlay = NULL, rescale_original = FALSE,
                              alpha = NULL, filename = NULL, preview = FALSE) {
   imagetype = get_file_type(image)
@@ -167,16 +166,16 @@ add_image_overlay = function(image, image_overlay = NULL, rescale_original = FAL
   }
   dimensions_overlay = dim(tempover)
   if(!rescale_original) {
-    magick::image_read(temp) %>%
+    magick::image_read(temp) |>
       magick::image_composite(
         magick::image_scale(magick::image_read(image_overlay_file),
                             paste0(dimensions[1],"x",dimensions[2],"!")), operator = "Over"
-      ) %>%
+      ) |>
       magick::image_write(path = temp, format = "png")
   } else {
-    magick::image_read(temp) %>%
-      magick::image_scale(paste0(dimensions_overlay[1],"x",dimensions_overlay[2],"!")) %>%
-      magick::image_composite(magick::image_read(image_overlay_file), operator = "Over") %>%
+    magick::image_read(temp) |>
+      magick::image_scale(paste0(dimensions_overlay[1],"x",dimensions_overlay[2],"!")) |>
+      magick::image_composite(magick::image_read(image_overlay_file), operator = "Over") |>
       magick::image_write(path = temp, format = "png")
   }
   temp = png::readPNG(temp)

@@ -23,7 +23,7 @@ add_title(
 \arguments{
 \item{image}{Image filename or 3-layer RGB array.}
 
-\item{title_text}{Default \code{NULL}. Text. Adds a title to the image, using magick::image_annotate.}
+\item{title_text}{Default \code{NULL}. Text. Adds a title to the image, using \code{magick::image_annotate()}.}
 
 \item{title_offset}{Default \code{c(15,15)}. Distance from the top-left (default, \code{gravity} direction in
 image_annotate) corner to offset the title.}
@@ -41,7 +41,8 @@ image_annotate) corner to offset the title.}
 
 \item{title_bar_alpha}{Default \code{0.5}. Transparency of the title bar.}
 
-\item{title_bar_width}{Default \code{NULL}, automatic. Width of the title bar in pixels.}
+\item{title_bar_width}{Default \code{NULL}, automaticly calculated from the size of the text and
+the number of line breaks. Width of the title bar in pixels.}
 
 \item{title_position}{Default \code{northwest}. Position of the title.}
 
@@ -58,32 +59,33 @@ to returning it.}
 Takes an RGB array/filename and adds a title with an optional titlebar.
 }
 \examples{
-#if(interactive()){
+if(rayimage:::run_documentation()){
 #Plot the dragon
-\donttest{
 add_title(dragon, preview = TRUE, title_text = "Dragon", title_size=20)
 }
+if(rayimage:::run_documentation()){
 #That's hard to see--let's add a title bar:
-\donttest{
 add_title(dragon, preview = TRUE, title_text = "Dragon", title_size=20,
          title_bar_color="white")
 }
-
+if(rayimage:::run_documentation()){
 #Change the width of the bar:
-\donttest{
 add_title(dragon, preview = TRUE, title_text = "Dragon", title_size=20,
          title_bar_color="white", title_offset = c(12,12))
 }
+if(rayimage:::run_documentation()){
+#The width of the bar will also automatically adjust for newlines:
+add_title(dragon, preview = TRUE, title_text = "Dragon\n(Blue)", title_size=20,
+         title_bar_color="white", title_offset = c(12,12))
+}
+if(rayimage:::run_documentation()){
 #Change the color and title color:
-\donttest{
 add_title(dragon, preview = TRUE, title_text = "Dragon", title_size=20,
          title_bar_color="red", title_color = "white", title_offset = c(12,12))
 }
-
+if(rayimage:::run_documentation()){
 #Change the transparency:
-\donttest{
 add_title(dragon, preview = TRUE, title_text = "Dragon", title_size=20, title_bar_alpha = 0.8,
          title_bar_color="red", title_color = "white", title_offset = c(12,12))
 }
-#end}
 }

@@ -19,34 +19,31 @@
 #'@import grDevices
 #'@export
 #'@examples
-#'#if(interactive()){
+#'if(rayimage:::run_documentation()){
 #'#Plot the dragon
 #'plot_image(dragon)
-#'
+#'}
+#'if(rayimage:::run_documentation()){
 #'#Add a vignette effect:
-#'\donttest{
 #'add_vignette(dragon, preview = TRUE, vignette = 0.5)
 #'}
+#'if(rayimage:::run_documentation()){
 #'#Darken the vignette effect:
-#'\donttest{
 #'add_vignette(dragon, preview = TRUE, vignette = 1)
 #'}
-#'
+#'if(rayimage:::run_documentation()){
 #'#Change the radius:
-#'\donttest{
 #'add_vignette(dragon, preview = TRUE, vignette = 1, radius=1.5)
 #'add_vignette(dragon, preview = TRUE, vignette = 1, radius=0.5)
 #'}
-#'
+#'if(rayimage:::run_documentation()){
 #'#Change the color:
-#'\donttest{
 #'add_vignette(dragon, preview = TRUE, vignette = 1, color="white")
 #'}
+#'if(rayimage:::run_documentation()){
 #'#Increase the width of the blur by 50%:
-#'\donttest{
 #'add_vignette(dragon, preview = TRUE, vignette = c(1,1.5))
 #'}
-#'#end}
 add_vignette = function(image, vignette = 0.5, color = "#000000", radius = 1.3,
                         filename = NULL, preview = FALSE) {
   imagetype = get_file_type(image)
@@ -96,8 +93,8 @@ add_vignette = function(image, vignette = 0.5, color = "#000000", radius = 1.3,
   }
   imagefile = make_vignette_overlay(width=dimensions[1],height=dimensions[2],
                                     intensity=vignette, radius=radiusval, radius_multiplier = radius, color=color)
-  magick::image_read(temp) %>%
-    magick::image_composite(magick::image_read(imagefile)) %>%
+  magick::image_read(temp) |>
+    magick::image_composite(magick::image_read(imagefile)) |>
     magick::image_write(path = temp, format = "png")
   temp = png::readPNG(temp)
   if(length(dim(temp)) == 3 && dim(temp)[3] == 2) {
