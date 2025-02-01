@@ -10,7 +10,9 @@
 #'@param asp Default `1`. Aspect ratio of the pixels in the plot. For example, an aspect ratio of `4/3` will
 #'slightly widen the image.
 #'@param new_page  Default `TRUE`. Whether to call `grid::grid.newpage()` before plotting the image.
+#'@param ignore_alpha Default `FALSE`. Whether to ignoe the alpha channel when plotting.
 #'@param return_grob Default `FALSE`. Whether to return the grob object.
+#'@param gp A `grid::gpar()` object to include for the grid viewport displaying the image.
 #'@export
 #'@examples
 #'#if(interactive()){
@@ -23,14 +25,10 @@
 #'#Make pixels twice as tall as wide
 #'plot_image(dragon[1:100,,], asp = 1/2)
 #'#end}
-plot_image = function(image, rotate=0, draw_grid = FALSE,
-                      asp = 1, new_page = TRUE, return_grob = FALSE) {
-  image = ray_read_image(image) #Always output RGB array
-  if(dim(image)[3] == 4) {
-    if(any(image[,,4] != 1)) {
-      message("Note: alpha channel will be ignored when plotting image.")
-    }
-  }
+plot_image = function(image, rotate=0, draw_grid = FALSE, ignore_alpha = FALSE,
+                      asp = 1, new_page = TRUE, return_grob = FALSE,
+                      gp = grid::gpar()) {
+  image = ray_read_image(image) #Always output RGBA array
   rotatef = function(x) t(apply(x, 2, rev))
   if(!(rotate %in% c(0,90,180,270))) {
     if(length(rotate) == 1) {
@@ -45,9 +43,10 @@ plot_image = function(image, rotate=0, draw_grid = FALSE,
 
   if(number_of_rots != 0) {
     newarray = image
-    newarrayt = array(0,dim=c(ncol(image),nrow(image),3))
+    channels = dim(image)[3]
+    newarrayt = array(0,dim=c(ncol(image),nrow(image),channels))
     for(i in seq_len(number_of_rots)) {
-      for(j in 1:3) {
+      for(j in seq_len(channels)) {
         if(i == 2) {
           newarray[,,j] = rotatef(newarrayt[,,j])
         } else {
@@ -71,13 +70,17 @@ plot_image = function(image, rotate=0, draw_grid = FALSE,
     grid::grid.newpage()
   }
 
+  image_dim = dim(image)
+
   # Draw a grid to differentiate image from background
   if(draw_grid) {
     draw_grid_fxn = function() {
       grid::pushViewport(
-        grid::viewport(layout = grid::grid.layout(1, 1,
-                                                  widths = grid::unit(1, "npc"),
-                                                  heights = grid::unit(1, "npc")))
+        grid::viewport(
+          layout = grid::grid.layout(1, 1,
+                                     widths = grid::unit(image_dim[1], "pt"),
+                                     heights = grid::unit(image_dim[2], "pt")),
+          gp = gp)
       )
       # Define grid density and angle
       grid_density = 0.01 # Adjust this value for tighter or looser grid

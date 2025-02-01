@@ -8,9 +8,11 @@ plot_image(
   image,
   rotate = 0,
   draw_grid = FALSE,
+  ignore_alpha = FALSE,
   asp = 1,
   new_page = TRUE,
-  return_grob = FALSE
+  return_grob = FALSE,
+  gp = grid::gpar()
 )
 }
 \arguments{
@@ -22,12 +24,16 @@ plot_image(
 disambiguate the actual image from the device (helpful if the image background is the same as the
 device's background).}
 
+\item{ignore_alpha}{Default \code{FALSE}. Whether to ignoe the alpha channel when plotting.}
+
 \item{asp}{Default \code{1}. Aspect ratio of the pixels in the plot. For example, an aspect ratio of \code{4/3} will
 slightly widen the image.}
 
 \item{new_page}{Default \code{TRUE}. Whether to call \code{grid::grid.newpage()} before plotting the image.}
 
 \item{return_grob}{Default \code{FALSE}. Whether to return the grob object.}
+
+\item{gp}{A \code{grid::gpar()} object to include for the grid viewport displaying the image.}
 }
 \description{
 Displays the image in the current device.

@@ -4,7 +4,13 @@
 \alias{plot_image_grid}
 \title{Plot Image Grid}
 \usage{
-plot_image_grid(input_list, dim = c(1, 1), asp = 1, draw_grid = FALSE)
+plot_image_grid(
+  input_list,
+  dim = c(1, 1),
+  asp = 1,
+  draw_grid = FALSE,
+  gp = grid::gpar()
+)
 }
 \arguments{
 \item{input_list}{List of array (or matrix) image inputs.}
@@ -18,6 +24,8 @@ slightly widen the image. This can also be a vector the same length of
 \item{draw_grid}{Default \code{FALSE}. If \code{TRUE}, this will draw a grid in the background to help
 disambiguate the actual image from the device (helpful if the image background is the same as the
 device's background).}
+
+\item{gp}{A \code{grid::gpar()} object to include for the grid viewport displaying the image.}
 }
 \description{
 Displays the image in the current device.

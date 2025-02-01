@@ -16,28 +16,28 @@
 #'if(run_documentation()){
 #'#Plot the image with a title
 #'dragon |>
-#'  add_title("Dragon", title_offset=c(10,10), title_bar_color="black",
+#'  render_title("Dragon", title_offset=c(10,10), title_bar_color="black",
 #'            title_size=20, title_color = "white") |>
 #'  plot_image()
 #'}
 #'if(run_documentation()){
 #'#Half of the resolution
 #'render_resized(dragon, mag = 1/2) |>
-#'  add_title("Dragon (half res)", title_offset=c(5,5), title_bar_color="black",
+#'  render_title("Dragon (half res)", title_offset=c(5,5), title_bar_color="black",
 #'            title_size=10, title_color = "white") |>
 #'  plot_image()
 #'}
 #'if(run_documentation()){
 #'#Double the resolution
 #'render_resized(dragon, mag = 2) |>
-#'  add_title("Dragon (2x res)", title_offset=c(20,20), title_bar_color="black",
+#'  render_title("Dragon (2x res)", title_offset=c(20,20), title_bar_color="black",
 #'            title_size=40, title_color = "white") |>
 #'  plot_image()
 #'}
 #'if(run_documentation()){
 #'#Specify the exact resulting dimensions
 #'render_resized(dragon, dim = c(320,160)) |>
-#'  add_title("Dragon (custom size)", title_offset=c(10,10), title_bar_color="black",
+#'  render_title("Dragon (custom size)", title_offset=c(10,10), title_bar_color="black",
 #'            title_size=20, title_color = "white") |>
 #'  plot_image()
 #'}
@@ -99,14 +99,5 @@ render_resized = function(image, mag = 1, dims = NULL, filename=NULL, preview=FA
       temp_image = resize_matrix_stb(temp_image, dims[1],dims[2],method)
     }
   }
-  if(is.null(filename)) {
-    if(preview) {
-      plot_image(render_clamp(temp_image))
-      return(invisible(temp_image))
-    } else {
-      temp_image
-    }
-  } else {
-    ray_write_image(render_clamp(temp_image),filename)
-  }
+  handle_image_output(temp_image, filename = filename, preview = preview)
 }
