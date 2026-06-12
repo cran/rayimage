@@ -19,6 +19,8 @@ render_text_image(
   filename = NULL,
   check_text_width = TRUE,
   check_text_height = TRUE,
+  trim = FALSE,
+  trim_padding = 0,
   preview = FALSE
 )
 }
@@ -46,7 +48,7 @@ between \code{0} (fully transparent) and \code{1} (fully opaque).}
 
 \item{width}{Default \code{NA}. User-defined textbox width.}
 
-\item{height}{Default \code{NA}. User-defined textbox width.}
+\item{height}{Default \code{NA}. User-defined textbox height.}
 
 \item{filename}{Default \code{NULL}. String specifying the file path to save the resulting image.
 If \code{NULL} and \code{preview = FALSE}, the function returns the processed RGB array.}
@@ -61,6 +63,15 @@ a suitable image is found.}
 box of the resulting image to ensure the string bbox is tall enough for the text.
 This will ensure a tight vertical bounding box on the text.}
 
+\item{trim}{Default \code{FALSE}. If \code{TRUE}, post-process the rendered image by
+cropping it to the tight bounding box of the text or emoji pixels. The
+bounding box is measured from a transparent text mask, so this can also trim
+images with opaque backgrounds.}
+
+\item{trim_padding}{Default \code{0}. Padding in pixels to add after trimming. Use
+a scalar for equal padding on all sides, or \code{c(top, right, bottom, left)}.
+Nonzero padding implies \code{trim = TRUE}.}
+
 \item{preview}{Default \code{FALSE}. Boolean indicating whether to display the image after processing.
 If \code{TRUE}, the image is displayed but not saved or returned.}
 }
@@ -72,37 +83,32 @@ Otherwise, writes the image to the specified file or displays it if \code{previe
 Generates an image which tightly fits text.
 }
 \examples{
-if (run_documentation()) {
+\dontshow{if (interactive() || identical(Sys.getenv("IN_PKGDOWN"), "true")) withAutoprint(\{ # examplesIf}
   #Generate an image of some text
   render_text_image("Some text", preview = TRUE)
-}
-if (run_documentation()) {
   #Change the font size
   render_text_image("Some text", size = 100, preview = TRUE)
-}
-if (run_documentation()) {
   #Change the font color
   render_text_image("Some text", size = 100, color="red",preview = TRUE)
-}
-if (run_documentation()) {
   #Change the background color and transparency
   render_text_image("Some text", size = 50, color="purple",
                       background_color="purple", background_alpha = 0.5,
                       preview = TRUE)
-}
-if (run_documentation()) {
   # Plot an emoji with the agg device.
   render_text_image("\U0001F600\U0001F680", size = 50, color = "purple", use_ragg = TRUE,
                     background_alpha = 0,
                     preview = TRUE)
-}
 
-if (run_documentation()) {
   # Plot an emoji with the agg device and adjust the height and width (which
   # is on by default) to be a tight fit.
   render_text_image("\U0001F600\U0001F680", size = 50, color = "purple", use_ragg = TRUE,
                     background_alpha = 0, check_text_width = TRUE,
                     check_text_height = TRUE,
                     preview = TRUE)
-}
+
+  # Trim the image to the rendered glyphs and then add transparent padding.
+  render_text_image("\U0001F409", size = 80, use_ragg = TRUE,
+                    background_alpha = 0, trim = TRUE, trim_padding = 8,
+                    preview = TRUE)
+\dontshow{\}) # examplesIf}
 }

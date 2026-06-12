@@ -1,30 +1,26 @@
 #'@title Render Boolean Distance
 #'
-#'@description Takes an matrix (or  and returns the nearest distance to each TRUE.
+#'@description Takes a logical matrix and returns the nearest distance to each TRUE value.
 #'
 #'@param boolean Logical matrix (or matrix of 1s and 0s), where distance will be measured to the `TRUE` values.
 #'@param rescale Default `FALSE`. Rescales the calculated distance to a range of 0-1.
 #'Useful for visualizing the distance matrix.
 #'@return Matrix of distance values.
 #'@export
-#'@examples
-#'if(run_documentation()){
+#'@examplesIf interactive() || identical(Sys.getenv("IN_PKGDOWN"), "true")
 #'#Measure distance to
 #'plot_image(render_boolean_distance(t(volcano) > 150))
 #'plot_image(render_boolean_distance(t(volcano) < 150))
-#'}
-#'if(run_documentation()){
 #'#If we want to rescale this to zero to one (to visualize like an image), set rescale=TRUE
 #'plot_image(render_boolean_distance(t(volcano) > 150,rescale=TRUE))
-#'}
 render_boolean_distance = function(boolean, rescale = FALSE) {
-  if(any(is.na(boolean))) {
+  if (any(is.na(boolean))) {
     stop("`boolean` must not have any NA values")
   }
   distval = get_boolean_distance(boolean)
-  if(rescale) {
-    if(min(distval) != max(distval)) {
-      distval = (distval-min(distval))/(max(distval) - min(distval))
+  if (rescale) {
+    if (min(distval) != max(distval)) {
+      distval = (distval - min(distval)) / (max(distval) - min(distval))
     }
     return(distval)
   } else {

@@ -8,22 +8,26 @@ render_image_overlay(
   image,
   image_overlay = NULL,
   rescale_original = FALSE,
-  alpha = NULL,
+  convert_overlay_colorspace = TRUE,
+  alpha = NA,
   filename = NULL,
   preview = FALSE
 )
 }
 \arguments{
-\item{image}{Image filename or 3-layer RGB array.}
+\item{image}{3-layer RGB/4-layer RGBA array, \code{rayimg} class, or filename of an image.}
 
-\item{image_overlay}{Default \code{NULL}. Either a string indicating the location of a png image to overlay
-over the image (transparency included), or a 4-layer RGBA array. This image will be resized to the
-dimension of the image if it does not match exactly.}
+\item{image_overlay}{Default \code{NULL}. 3-layer RGB/4-layer RGBA array, \code{rayimg} class, or filename of an image.
+This image will be resized to the dimensions of \code{image} if it does not match
+exactly, unless \code{rescale_original = TRUE}.}
 
 \item{rescale_original}{Default \code{FALSE}. If \code{TRUE}, function will resize the original image to match
 the overlay.}
 
-\item{alpha}{Default \code{NULL}, using overlay's alpha channel. Otherwise, this sets the alpha transparency
+\item{convert_overlay_colorspace}{Default \code{TRUE}. Whether to convert the overlay's colorspace
+to match the underlying image.}
+
+\item{alpha}{Default \code{NA}, using overlay's alpha channel. Otherwise, this sets the alpha transparency
 by multiplying the existing alpha channel by this value (between 0 and 1).}
 
 \item{filename}{Default \code{NULL}. File to save the image to. If \code{NULL} and \code{preview = FALSE},
@@ -33,17 +37,17 @@ returns an RGB array.}
 to returning it.}
 }
 \value{
-3-layer RGB array of the processed image.
+A \code{rayimg} RGBA array.
 }
 \description{
-Takes an RGB array/filename and adds an image overlay.
+Takes an RGB array/filename and composites an image overlay over
+the full image. For pixel-positioned sprite, label, glyph, or billboard
+overlays, use \code{\link[=render_sprite_overlay]{render_sprite_overlay()}}.
 }
 \examples{
-if(run_documentation()){
+\dontshow{if (interactive() || identical(Sys.getenv("IN_PKGDOWN"), "true")) withAutoprint(\{ # examplesIf}
 #Plot the dragon
 plot_image(dragon)
-}
-if(run_documentation()){
 #Add an overlay of a red semi-transparent circle:
 circlemat = generate_2d_disk(min(dim(dragon)[1:2]))
 circlemat = circlemat/max(circlemat)
@@ -57,5 +61,49 @@ dragon_clipped = dragon
 dragon_clipped[dragon_clipped > 1] = 1
 render_image_overlay(dragon_clipped, image_overlay = rgba_array,
                  alpha=0.5, preview = TRUE)
-}
+
+	# Read photo, convert to ACEScg with CAT (scene)
+	photo = ray_read_image(sunset_image, normalize = FALSE)
+	photo_aces = render_convert_colorspace(
+		photo,
+		to_mats = CS_ACESCG,
+		adapt_white = TRUE
+	)
+	tmp_txt = tempfile(fileext = ".png")
+	render_text_image(
+		"Sunset",
+		size = 60,
+		filename = tmp_txt,
+		color = "#c300ff",
+		background_alpha = 0
+	)
+	# Read logo (display-referred), convert primaries only (no CAT)
+	logo = ray_read_image(tmp_txt, normalize = FALSE) # sRGB/D65
+	logo_aces = render_convert_colorspace(
+		logo,
+		to_mats = CS_ACESCG,
+		adapt_white = FALSE
+	)
+
+	# Composite in ACEScg, then display (plot_image converts to sRGB/D65 + OETF)
+	# Here, we also turn overlay conversion in [render_image_overlay()] off,
+ # to show what happens when you don't account for the colorspace difference.
+ # By default [render_image_overlay()] will do this for you.
+	comp1 = render_image_overlay(
+		photo_aces,
+		logo_aces,
+		convert_overlay_colorspace = FALSE
+	) |>
+   render_title(title_text = "#c300ff: Match",
+                title_bar_color = "white", title_color = "#c300ff", title_bar_alpha=1)
+	comp2 = render_image_overlay(
+		photo_aces,
+		logo,
+		convert_overlay_colorspace = FALSE
+	) |>
+	 render_title(title_text = "#c300ff: Incorrect",
+               title_bar_color = "white", title_color = "#c300ff", title_bar_alpha=1)
+
+	plot_image_grid(list(comp1, comp2), dim = c(1, 2))
+\dontshow{\}) # examplesIf}
 }

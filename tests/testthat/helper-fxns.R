@@ -1,0 +1,197 @@
+snapshot_variant = function() {
+  sysname = Sys.info()[["sysname"]]
+  if (dir.exists(testthat::test_path("_snaps", sysname))) {
+    return(sysname)
+  }
+  "Darwin"
+}
+
+snapshot_tests_enabled = function() {
+  identical(Sys.getenv("RAYIMAGE_RUN_SNAPSHOT_TESTS"), "true")
+}
+
+skip_unless_snapshot_tests_enabled = function() {
+  if (snapshot_tests_enabled()) {
+    return(invisible())
+  }
+  testthat::skip(
+    "Visual snapshot tests are local-only. Set RAYIMAGE_RUN_SNAPSHOT_TESTS=true to run them."
+  )
+}
+
+save_test_png = function(code, path) {
+  grDevices::png(filename = path, width = 500, height = 400)
+  dev_id = grDevices::dev.cur()
+
+  on.exit(
+    {
+      try(grid::upViewport(0), silent = TRUE)
+      devs = grDevices::dev.list()
+      if (!is.null(devs) && dev_id %in% devs) {
+        grDevices::dev.off(dev_id)
+      }
+    },
+    add = TRUE
+  )
+
+  code()
+  path
+}
+
+compare_image = function(
+  path1,
+  path2,
+  quantile_diff = 0.001,
+  cdf_diff = 0.1,
+  max_diff = 0.3
+) {
+  image1 = unclass(ray_read_image(path1, convert_to_array = TRUE))
+  image2 = unclass(ray_read_image(path2, convert_to_array = TRUE))
+
+  dim1 = dim(image1)
+  dim2 = dim(image2)
+
+  attributes(image1) = list(dim = dim1)
+  attributes(image2) = list(dim = dim2)
+
+  if (!identical(dim1, dim2)) {
+    warning(
+      sprintf(
+        "Dim not the same: %s vs %s",
+        paste0(dim1, collapse = "x"),
+        paste0(dim2, collapse = "x")
+      ),
+      call. = FALSE
+    )
+    return(FALSE)
+  }
+
+  diffs = abs(image2 - image1)
+  #Ignore small differences
+  mostly_identical = sum(diffs > cdf_diff) < length(diffs) * quantile_diff
+  diffs_are_minor = max(diffs) < max_diff
+  if (!mostly_identical) {
+    warning(
+      sprintf(
+        "Number greater than CDF diff: %i vs %i/%i",
+        sum(diffs > cdf_diff),
+        length(diffs) * quantile_diff,
+        length(diffs)
+      ),
+      call. = FALSE
+    )
+  }
+  if (!diffs_are_minor) {
+    warning(
+      sprintf("Max diff: %f vs %f", max(diffs), max_diff),
+      call. = FALSE
+    )
+  }
+  return(mostly_identical && diffs_are_minor)
+}
+
+expect_snapshot_file_info = function(path, name, compare, variant, args, i) {
+  tryCatch(
+    {
+      expect_snapshot_file(
+        path = path,
+        name = name,
+        compare = compare,
+        variant = variant
+      )
+    },
+    error = function(e) {
+      is_mat_args = unlist(lapply(args, is.array)) |
+        unlist(lapply(args, is.list))
+      for (arg_index in seq_along(args)) {
+        if (is_mat_args[arg_index]) {
+          args[[arg_index]] = "[[ matrix / array ]]"
+        }
+      }
+      stop(sprintf(
+        "Snapshot test failed on row %d with arguments: %s\n\nOriginal error: %s",
+        i,
+        paste(names(args), unname(args), sep = "=", collapse = ", "),
+        e$message
+      ))
+    }
+  )
+}
+
+expect_no_error_info = function(code, args, i) {
+  tryCatch(
+    {
+      expect_no_error(
+        code
+      )
+    },
+    error = function(e) {
+      is_mat_args = unlist(lapply(args, is.array)) |
+        unlist(lapply(args, is.list)) |
+        unlist(lapply(args, \(x) length(x) > 10))
+      for (arg_index in seq_along(args)) {
+        if (is_mat_args[arg_index]) {
+          args[[arg_index]] = "[[ matrix / array ]]"
+        }
+      }
+      stop(sprintf(
+        "Snapshot test failed on row %d with arguments: %s\n\nOriginal error: %s",
+        i,
+        paste(names(args), unname(args), sep = "=", collapse = ", "),
+        e$message
+      ))
+    }
+  )
+}
+
+run_tests = function(
+  func,
+  argument_grid,
+  plot_prefix = "",
+  warning_rows = NULL,
+  error_rows = NULL,
+  ...
+) {
+  stopifnot(inherits(argument_grid, "data.frame"))
+  variant = snapshot_variant()
+  for (i in seq_len(nrow(argument_grid))) {
+    args = unlist(argument_grid[i, , drop = FALSE], recursive = FALSE)
+    test_filename = sprintf("%s_test%i.png", plot_prefix, i)
+
+    args = append(args, ...)
+    if (i %in% warning_rows) {
+      expect_snapshot_warning(
+        do.call(func, args = args),
+        variant = variant
+      )
+    } else if (i %in% error_rows) {
+      expect_snapshot_error(
+        do.call(func, args = args),
+        variant = variant
+      )
+    }
+    if (interactive()) {
+      do.call(func, args = args) |>
+        expect_no_error_info(args = args, i = i)
+    } else {
+      skip_unless_snapshot_tests_enabled()
+      path = tempfile(fileext = ".png")
+      path = suppressWarnings(suppressMessages(
+        save_test_png(
+          function() {
+            do.call(func, args = args)
+          },
+          path
+        )
+      ))
+      expect_snapshot_file_info(
+        path = path,
+        name = test_filename,
+        compare = compare_image,
+        variant = variant,
+        args = args,
+        i = i
+      )
+    }
+  }
+}

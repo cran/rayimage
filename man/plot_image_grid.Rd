@@ -13,7 +13,7 @@ plot_image_grid(
 )
 }
 \arguments{
-\item{input_list}{List of array (or matrix) image inputs.}
+\item{input_list}{List of 3-layer RGB/4-layer RGBA array, \code{rayimg} class, or image filenames.}
 
 \item{dim}{Default \code{c(1,1)}. Width by height of output grid.}
 
@@ -31,25 +31,17 @@ device's background).}
 Displays the image in the current device.
 }
 \examples{
-if(run_documentation()){
+\dontshow{if (interactive() || identical(Sys.getenv("IN_PKGDOWN"), "true")) withAutoprint(\{ # examplesIf}
 #Plot the dragon array
 plot_image_grid(list(dragon, 1-dragon), dim = c(1,2))
-}
-if(run_documentation()){
 plot_image_grid(list(dragon, 1-dragon), dim = c(2,1))
-}
-if(run_documentation()){
 plot_image_grid(list(dragon, NULL, 1-dragon), dim = c(2,2), asp = c(2,1,1/2))
-}
-if(run_documentation()){
 plot_image_grid(list(dragon, NULL, NULL, dragon), dim = c(2,2), asp = c(2,1,1,1/2))
-}
-if(run_documentation()){
 #Plot alongside the depth matrix
 dragon_depth_reoriented = render_reorient(dragondepth,
                                          transpose = TRUE,
                                          flipx = TRUE)/2000
 plot_image_grid(list(dragondepth/2000, dragon, dragon, dragondepth/2000),
                dim = c(2,2))
-}
+\dontshow{\}) # examplesIf}
 }

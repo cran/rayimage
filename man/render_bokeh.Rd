@@ -18,13 +18,12 @@ render_bokeh(
   bokehlimit = 0.8,
   rotation = 0,
   aberration = 0,
-  gamma_correction = TRUE,
   progress = interactive(),
   ...
 )
 }
 \arguments{
-\item{image}{Image filename or 3-layer RGB array.}
+\item{image}{3-layer RGB/4-layer RGBA array, \code{rayimg} class, or filename of an image.}
 
 \item{depthmap}{Depth map filename or 1d array.}
 
@@ -52,14 +51,12 @@ passes in a 2D matrix, that matrix will control the shape of the bokeh.}
 
 \item{aberration}{Default \code{0}. Adds chromatic aberration to the image. Maximum of \code{1}.}
 
-\item{gamma_correction}{Default \code{TRUE}. Controls gamma correction when adding colors. Default exponent of 2.2.}
-
 \item{progress}{Default \code{TRUE}. Whether to display a progress bar.}
 
-\item{...}{Additional arguments to pass to \code{plot_image()} if \code{preview = TRUE}.}
+\item{...}{Additional arguments to pass to \code{\link[=plot_image]{plot_image()}} if \code{preview = TRUE}.}
 }
 \value{
-3-layer RGB array of the processed image.
+A \code{rayimg} RGBA array.
 }
 \description{
 Takes an image and a depth map to render the image with depth of field
@@ -67,46 +64,30 @@ Takes an image and a depth map to render the image with depth of field
 or use one of the built-in bokeh types.
 }
 \examples{
-if(run_documentation()){
+\dontshow{if (interactive() || identical(Sys.getenv("IN_PKGDOWN"), "true")) withAutoprint(\{ # examplesIf}
 #Plot the dragon
 plot_image(dragon)
-}
-if(run_documentation()){
 #Plot the depth map
 plot_image(dragondepth/1500)
-}
-if(run_documentation()){
 #Preview the focal plane:
 render_bokeh(dragon, dragondepth, focus=950, preview_focus = TRUE)
-}
-if(run_documentation()){
 #Change the focal length:
 render_bokeh(dragon, dragondepth, focus=950, focallength=300)
-}
-if(run_documentation()){
 #Add chromatic aberration:
 render_bokeh(dragon, dragondepth, focus=950, focallength=300, aberration = 0.5)
-}
-if(run_documentation()){
 #Change the focal distance:
 render_bokeh(dragon, dragondepth, focus=600, focallength=300)
 render_bokeh(dragon, dragondepth, focus=1300, focallength=300)
-}
-if(run_documentation()){
 #Change the bokeh shape to a hexagon:
 render_bokeh(dragon, dragondepth, bokehshape = "hex",
             focallength=300, focus=600)
-}
-if(run_documentation()){
 #Change the bokeh intensity:
 render_bokeh(dragon, dragondepth,
             focallength=400, focus=900, bokehintensity = 1)
 render_bokeh(dragon, dragondepth,
             focallength=400, focus=900, bokehintensity = 3)
-}
-if(run_documentation()){
 #Rotate the hexagonal shape:
-render_bokeh(dragon, dragondepth, bokehshape = "hex", rotation=15,
-            focallength=300, focus=600)
-}
+render_bokeh(dragon, dragondepth, bokehshape = "hex", rotation=15, bokehintensity=3,
+            focallength=400, focus=800)
+\dontshow{\}) # examplesIf}
 }

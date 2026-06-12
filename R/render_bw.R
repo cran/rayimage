@@ -2,28 +2,60 @@
 #'
 #'@description Transforms an image to black and white, preserving luminance.
 #'
-#'@param image Image filename, 3-layer RGB array, or matrix.
+#'@param image 3-layer RGB/4-layer RGBA array, `rayimg` class, or filename of an image.
 #'@param rgb_coef Default `c(0.2126, 0.7152, 0.0722)`.
 #'Length-3 numeric vector listing coefficients to convert RGB to luminance.
 #'@param filename Default `NULL`. The filename of the image to be saved. If this is not given, the image will be plotted instead.
 #'@param preview Default `FALSE`. Whether to plot the convolved image, or just to return the values.
-#'@return 3-layer RGB resized array or matrix.
+#'@return A `rayimg` RGBA array.
 #'@export
-#'@examples
-#'if(run_documentation()){
+#'@examplesIf interactive() || identical(Sys.getenv("IN_PKGDOWN"), "true")
 #'#Plot the image with a title
 #'dragon |>
 #'  render_title("Dragon", title_offset=c(10,10), title_bar_color="black",
 #'            title_size=20, title_color = "white") |>
 #'  render_bw(preview = TRUE)
-#'}
-render_bw = function(image, rgb_coef = c(0.2126, 0.7152, 0.0722),
-                     filename=NULL, preview=FALSE) {
+render_bw = function(
+  image,
+  rgb_coef = c(0.2126, 0.7152, 0.0722),
+  filename = NULL,
+  preview = FALSE
+) {
   stopifnot(length(rgb_coef) == 3 && is.numeric(rgb_coef))
-  temp_image = ray_read_image(image)
+  src = ray_read_image(image, reset_camera_settings = TRUE)
+  imagetype = attr(src, "filetype")
+  img_source_linear = attr(src, "source_linear")
+  colorspace = attr(src, "colorspace")
+  white_current = attr(src, "white_current")
 
-  # Calculate luminance
-  temp_image = rgb_coef[1] * temp_image[,,1] + rgb_coef[2] * temp_image[,,2] + rgb_coef[3] * temp_image[,,3]
+  d = dim(src)
+  is_array = length(d) == 3
 
-  handle_image_output(temp_image, filename = filename, preview = preview)
+  if (attr(src, "filetype") == "matrix" || (is_array && d[3] == 2)) {
+    return(handle_image_output(src, filename = filename, preview = preview))
+  }
+
+  # luminance
+  lum = rgb_coef[1] *
+    src[,, 1] +
+    rgb_coef[2] * src[,, 2] +
+    rgb_coef[3] * src[,, 3]
+
+  if (length(dim(src)) == 2) {
+    out = lum
+  } else {
+    out = array(1, dim = c(d[1], d[2], 2))
+    out[,, 1] = lum
+    out[,, 2] = if (d[3] == 4L) src[,, 4] else 1
+  }
+
+  out = ray_read_image(
+    out,
+    filetype = imagetype,
+    source_linear = img_source_linear,
+    assume_colorspace = colorspace,
+    assume_white = white_current
+  )
+
+  handle_image_output(out, filename = filename, preview = preview)
 }

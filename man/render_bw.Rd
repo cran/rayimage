@@ -12,7 +12,7 @@ render_bw(
 )
 }
 \arguments{
-\item{image}{Image filename, 3-layer RGB array, or matrix.}
+\item{image}{3-layer RGB/4-layer RGBA array, \code{rayimg} class, or filename of an image.}
 
 \item{rgb_coef}{Default \code{c(0.2126, 0.7152, 0.0722)}.
 Length-3 numeric vector listing coefficients to convert RGB to luminance.}
@@ -22,17 +22,17 @@ Length-3 numeric vector listing coefficients to convert RGB to luminance.}
 \item{preview}{Default \code{FALSE}. Whether to plot the convolved image, or just to return the values.}
 }
 \value{
-3-layer RGB resized array or matrix.
+A \code{rayimg} RGBA array.
 }
 \description{
 Transforms an image to black and white, preserving luminance.
 }
 \examples{
-if(run_documentation()){
+\dontshow{if (interactive() || identical(Sys.getenv("IN_PKGDOWN"), "true")) withAutoprint(\{ # examplesIf}
 #Plot the image with a title
 dragon |>
  render_title("Dragon", title_offset=c(10,10), title_bar_color="black",
            title_size=20, title_color = "white") |>
  render_bw(preview = TRUE)
-}
+\dontshow{\}) # examplesIf}
 }

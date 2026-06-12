@@ -8,22 +8,22 @@ render_vignette(
   image,
   vignette = 0.5,
   color = "#000000",
-  radius = 1.3,
+  radius = 1.1,
   filename = NULL,
   preview = FALSE
 )
 }
 \arguments{
-\item{image}{Image filename or 3-layer RGB array.}
+\item{image}{3-layer RGB/4-layer RGBA array, \code{rayimg} class, or filename of an image.}
 
-\item{vignette}{Default \code{0.5}. A camera vignetting effect will be added to the image.
+\item{vignette}{Default \code{1}. A camera vignetting effect will be added to the image.
 \code{1} is the darkest vignetting, while \code{0} is no vignetting. If vignette is a length-2 vector, the second entry will
 control the blurriness of the vignette effect (\code{1} is the default, e.g. \code{2} would double the blurriness but would take
 much longer to compute).}
 
 \item{color}{Default \code{"#000000"} (black). Color of the vignette.}
 
-\item{radius}{Default \code{1.3}. Multiplier for the size of the vignette. If \code{1}, the vignette touches
+\item{radius}{Default \code{1.1}. Multiplier for the size of the vignette. If \code{1}, the vignette touches
 the edge of the image.}
 
 \item{filename}{Default \code{NULL}. Filename which to save the image. If \code{NULL} and \code{preview = FALSE},
@@ -33,35 +33,25 @@ returns an RGB array.}
 to returning it.}
 }
 \value{
-3-layer RGB array of the processed image.
+A \code{rayimg} RGBA array.
 }
 \description{
 Takes an RGB array/filename and adds a camera vignette effect.
 }
 \examples{
-if(run_documentation()){
+\dontshow{if (interactive() || identical(Sys.getenv("IN_PKGDOWN"), "true")) withAutoprint(\{ # examplesIf}
 #Plot the dragon
 plot_image(dragon)
-}
-if(run_documentation()){
 #Add a vignette effect:
+render_vignette(dragon, preview = TRUE, vignette = 1, radius=1.1)
+#Lighten the vignette effect:
 render_vignette(dragon, preview = TRUE, vignette = 0.5)
-}
-if(run_documentation()){
-#Darken the vignette effect:
-render_vignette(dragon, preview = TRUE, vignette = 1)
-}
-if(run_documentation()){
 #Change the radius:
 render_vignette(dragon, preview = TRUE, vignette = 1, radius=1.5)
-render_vignette(dragon, preview = TRUE, vignette = 1, radius=0.5)
-}
-if(run_documentation()){
+render_vignette(dragon, preview = TRUE, vignette = 0.1, radius=0.8)
 #Change the color:
 render_vignette(dragon, preview = TRUE, vignette = 1, color="white")
-}
-if(run_documentation()){
 #Increase the width of the blur by 50\%:
 render_vignette(dragon, preview = TRUE, vignette = c(1,1.5))
-}
+\dontshow{\}) # examplesIf}
 }

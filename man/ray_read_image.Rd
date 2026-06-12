@@ -4,47 +4,95 @@
 \alias{ray_read_image}
 \title{Read Image}
 \usage{
-ray_read_image(image, convert_to_array = TRUE, preview = FALSE, ...)
+ray_read_image(
+  image,
+  convert_to_array = FALSE,
+  preview = FALSE,
+  source_linear = NA,
+  normalize = FALSE,
+  dng_normalize = FALSE,
+  normalize_to = CS_ACESCG,
+  normalize_adapt_white = TRUE,
+  assume_colorspace = NULL,
+  assume_white = NULL,
+  reset_camera_settings = FALSE,
+  ...
+)
 }
 \arguments{
-\item{image}{Image filename or 3-layer RGB array.}
+\item{image}{3-layer RGB/4-layer RGBA array, \code{rayimg} class, or filename of an image.}
 
-\item{convert_to_array}{Default \code{TRUE}. Whether to convert 2D B&W images/matrices to RGBA arrays.}
+\item{convert_to_array}{Default \code{FALSE}. Whether to convert 2D B&W images/matrices to RGBA arrays.}
 
 \item{preview}{Default \code{FALSE}. If \code{TRUE}, it will display the image in addition
 to returning it.}
 
-\item{...}{Arguments to pass to either \code{jpeg::readJPEG}, \code{png::readPNG}, or \code{tiff::readTIFF}.}
+\item{source_linear}{Default \code{NA}, automatically determined based on the image type.
+Whether the image source is linear data or sRGB. \code{TRUE} for matrices, arrays, and
+floating-point HDR formats (\code{EXR}, \code{HDR}), and \code{DNG}; \code{FALSE} for all other file-based formats
+(e.g., \code{jpeg}, \code{png}, \code{tiff}, \code{tga}, \code{bmp}, \code{psd}, \code{gif}, \code{pic}, \code{pnm}).}
+
+\item{normalize}{Default \code{FALSE}. If \code{TRUE}, convert to \code{normalize_to} space on read. Note that
+rayimg inputs will keep their colorspace and ignore this option--use \code{render_convert_colorspace()}
+to change an existing rayimg to a new colorspace.}
+
+\item{dng_normalize}{Default \code{FALSE}. If \code{TRUE}, DNG data is normalized to 0..1,
+using black/white levels; if \code{FALSE}, raw values are returned.}
+
+\item{normalize_to}{Default \code{CS_ACESCG}. Target colorspace when \code{normalize=TRUE}.}
+
+\item{normalize_adapt_white}{Default \code{TRUE}. If \code{TRUE}, Bradford-adapt source white to target white.}
+
+\item{assume_colorspace}{Default \code{NULL}. A colorspace descriptor (e.g., \code{CS_SRGB},
+\code{CS_ACESCG}). If given, the loaded image will be \emph{tagged} with this space
+rather than the default inferred by file type. No pixel conversion is performed
+unless \code{normalize=TRUE}.}
+
+\item{assume_white}{Default \code{NULL}. Scene/display white for the loaded image.
+Either a named white (\verb{"D60","D65","D50","D55","D75","E"}) or XYZ with Y=1.
+If \code{NULL}, uses \code{assume_colorspace$white_xyz}.}
+
+\item{reset_camera_settings}{Default \code{FALSE}. If \code{TRUE}, reset informational
+exposure/ISO metadata to neutral values (\code{exposure = 0}, \code{iso = 100}) when
+wrapping an existing \code{rayimg} or attributed array.}
+
+\item{...}{Arguments to pass to \code{jpeg::readJPEG}, \code{png::readPNG}, \code{tiff::readTIFF},
+or \code{libopenexr::read_exr()} for supported formats.}
 }
 \value{
-3-layer RGB array of the processed image.
+A \code{rayimg} RGBA array.
 }
 \description{
-Takes an RGB array/filename and adds an image overlay.
+Reads an image from a file/array/matrix. From files, supports
+\code{JPEG}, \code{PNG}, \code{TIFF}, \code{TGA}, \code{BMP}, \code{PSD}, \code{GIF}, \code{HDR}, \code{PIC}, \code{PNM}, \code{EXR},
+and \code{DNG} images.
 }
 \examples{
-if(run_documentation()){
+\dontshow{if (interactive() || identical(Sys.getenv("IN_PKGDOWN"), "true")) withAutoprint(\{ # examplesIf}
 #Write as a png
 tmparr = tempfile(fileext=".png")
 ray_read_image(dragon) |>
  ray_write_image(tmparr)
 ray_read_image(tmparr) |>
  plot_image()
-}
-if(run_documentation()){
 #Write as a JPEG (passing quality arguments via ...)
 tmparr = tempfile(fileext=".jpg")
 ray_read_image(dragon) |>
  ray_write_image(tmparr, quality = 0.2)
 ray_read_image(tmparr) |>
  plot_image()
-}
-if(run_documentation()){
 #Write as a tiff
 tmparr = tempfile(fileext=".tiff")
 ray_read_image(dragon) |>
  ray_write_image(tmparr)
 ray_read_image(tmparr) |>
   plot_image()
-}
+
+#Write as an exr
+tmparr = tempfile(fileext=".exr")
+ray_read_image(dragon) |>
+ ray_write_image(tmparr)
+ray_read_image(tmparr) |>
+  plot_image()
+\dontshow{\}) # examplesIf}
 }

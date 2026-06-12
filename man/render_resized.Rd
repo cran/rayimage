@@ -14,7 +14,7 @@ render_resized(
 )
 }
 \arguments{
-\item{image}{Image filename, 3-layer RGB array, or matrix.}
+\item{image}{3-layer RGB/4-layer RGBA array, \code{rayimg} class, or filename of an image.}
 
 \item{mag}{Default \code{1}. Amount to magnify the image, preserving aspect ratio. Overridden if
 \code{dim} is not \code{NULL}.}
@@ -29,38 +29,32 @@ render_resized(
 \code{catmull}, \code{mitchell}.}
 }
 \value{
-3-layer RGB resized array or matrix.
+A \code{rayimg} RGBA array.
 }
 \description{
 Resizes an image or a matrix, using bilinear interpolation.
 }
 \examples{
-if(run_documentation()){
+\dontshow{if (interactive() || identical(Sys.getenv("IN_PKGDOWN"), "true")) withAutoprint(\{ # examplesIf}
 #Plot the image with a title
 dragon |>
  render_title("Dragon", title_offset=c(10,10), title_bar_color="black",
            title_size=20, title_color = "white") |>
  plot_image()
-}
-if(run_documentation()){
 #Half of the resolution
 render_resized(dragon, mag = 1/2) |>
  render_title("Dragon (half res)", title_offset=c(5,5), title_bar_color="black",
            title_size=10, title_color = "white") |>
  plot_image()
-}
-if(run_documentation()){
 #Double the resolution
 render_resized(dragon, mag = 2) |>
  render_title("Dragon (2x res)", title_offset=c(20,20), title_bar_color="black",
            title_size=40, title_color = "white") |>
  plot_image()
-}
-if(run_documentation()){
 #Specify the exact resulting dimensions
-render_resized(dragon, dim = c(320,160)) |>
+render_resized(dragon, dim = c(160,320)) |>
  render_title("Dragon (custom size)", title_offset=c(10,10), title_bar_color="black",
            title_size=20, title_color = "white") |>
  plot_image()
-}
+\dontshow{\}) # examplesIf}
 }

@@ -19,37 +19,38 @@
 #'@param dim Default `c(11, 11)`. The dimensions of the matrix.
 #'@param radius Default `1`. Radius of the disk, compared to the dimensions. Should be less than one.
 #'@param rescale_unity Default `FALSE`. If `TRUE`, this will rescale the max value to one. Useful
-#'if wanting to plot the distribution with `plot_image()`.
+#'if wanting to plot the distribution with [plot_image()].
 #'@export
-#'@examples
-#'if(run_documentation()){
+#'@examplesIf interactive() || identical(Sys.getenv("IN_PKGDOWN"), "true")
 #'image(generate_2d_disk(101), asp=1)
-#'}
-generate_2d_disk = function(dim = c(11,11), radius = 1,
-                            rescale_unity = FALSE) {
+generate_2d_disk = function(
+  dim = c(11, 11),
+  radius = 1,
+  rescale_unity = FALSE
+) {
   dim = rev(dim)
   mindim = min(dim)
   add_offset_x = FALSE
   add_offset_y = FALSE
-  if(length(dim) == 2) {
-    if(dim[2] - dim[1] > 0) {
-      if(abs(dim[2] - dim[1]) %% 2 != 0) {
+  if (length(dim) == 2) {
+    if (dim[2] - dim[1] > 0) {
+      if (abs(dim[2] - dim[1]) %% 2 != 0) {
         add_offset_x = TRUE
       }
-    } else if(dim[2] - dim[1] < 0) {
-      if(abs(dim[2] - dim[1]) %% 2 != 0) {
+    } else if (dim[2] - dim[1] < 0) {
+      if (abs(dim[2] - dim[1]) %% 2 != 0) {
         add_offset_y = TRUE
       }
     }
   }
-  disk = generate_disk((1/radius)*1.18, mindim, add_offset_x,add_offset_y)
-  if(length(dim) == 2) {
-    disk = pad_to_fit(dim,disk)
+  disk = generate_disk((1 / radius) * 1.18, mindim, add_offset_x, add_offset_y)
+  if (length(dim) == 2) {
+    disk = pad_to_fit(dim, disk)
   }
-  disk = (disk - min(disk))/(max(disk)-min(disk))
-  disk = disk/sum(disk)
-  if(rescale_unity) {
-    return(disk/max(disk))
+  disk = (disk - min(disk)) / (max(disk) - min(disk))
+  disk = disk / sum(disk)
+  if (rescale_unity) {
+    return(disk / max(disk))
   }
   return(disk)
 }

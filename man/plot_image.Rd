@@ -6,25 +6,24 @@
 \usage{
 plot_image(
   image,
-  rotate = 0,
   draw_grid = FALSE,
   ignore_alpha = FALSE,
   asp = 1,
   new_page = TRUE,
   return_grob = FALSE,
-  gp = grid::gpar()
+  gp = grid::gpar(),
+  angle = 0,
+  show_linear = FALSE
 )
 }
 \arguments{
-\item{image}{Image array or filename of an image to be plotted.}
-
-\item{rotate}{Default 0. Rotates the output. Possible values: 0, 90, 180, 270.}
+\item{image}{3-layer RGB/4-layer RGBA array, \code{rayimg} class, or filename of an image.}
 
 \item{draw_grid}{Default \code{FALSE}. If \code{TRUE}, this will draw a grid in the background to help
 disambiguate the actual image from the device (helpful if the image background is the same as the
 device's background).}
 
-\item{ignore_alpha}{Default \code{FALSE}. Whether to ignoe the alpha channel when plotting.}
+\item{ignore_alpha}{Default \code{FALSE}. Whether to ignore the alpha channel when plotting.}
 
 \item{asp}{Default \code{1}. Aspect ratio of the pixels in the plot. For example, an aspect ratio of \code{4/3} will
 slightly widen the image.}
@@ -34,12 +33,17 @@ slightly widen the image.}
 \item{return_grob}{Default \code{FALSE}. Whether to return the grob object.}
 
 \item{gp}{A \code{grid::gpar()} object to include for the grid viewport displaying the image.}
+
+\item{angle}{Default \code{0}. Counter-clockwise rotation (in degrees) applied before plotting.}
+
+\item{show_linear}{Default \code{FALSE}. Most data should be gamma corrected before displaying on a screen.
+Set to \code{TRUE} to turn off this gamma correction.}
 }
 \description{
 Displays the image in the current device.
 }
 \examples{
-#if(interactive()){
+\dontshow{if (interactive() || identical(Sys.getenv("IN_PKGDOWN"), "true")) withAutoprint(\{ # examplesIf}
 #Plot the dragon array
 plot_image(dragon)
 #Make pixels twice as wide as tall
@@ -48,5 +52,5 @@ plot_image(dragon, asp = 2)
 plot_image(dragon[1:100,,])
 #Make pixels twice as tall as wide
 plot_image(dragon[1:100,,], asp = 1/2)
-#end}
+\dontshow{\}) # examplesIf}
 }

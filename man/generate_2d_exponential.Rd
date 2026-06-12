@@ -19,14 +19,14 @@ generate_2d_exponential(
 \item{width}{Default \code{3} (\code{-10} to \code{10}). The range in which to compute the distribution.}
 
 \item{rescale_unity}{Default \code{FALSE}. If \code{TRUE}, this will rescale the max value to one. Useful
-if wanting to plot the distribution with \code{plot_image()}.}
+if wanting to plot the distribution with \code{\link[=plot_image]{plot_image()}}.}
 }
 \description{
 Generates a 2D exponential distribution, with an optional
 argument to take the exponential to a user-defined power.
 }
 \examples{
-if(run_documentation()){
+\dontshow{if (interactive() || identical(Sys.getenv("IN_PKGDOWN"), "true")) withAutoprint(\{ # examplesIf}
 image(generate_2d_exponential(1,31,3), asp=1)
-}
+\dontshow{\}) # examplesIf}
 }

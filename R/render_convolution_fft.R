@@ -1,10 +1,10 @@
 #'@title Render Convolution FFT
 #'
-#'@description Takes an image and applys a convolution operation to it, using
-#'a user-supplied or built-in kernel. This function uses a fast-fourier transform and
+#'@description Takes an image and applies a convolution operation to it, using
+#'a user-supplied or built-in kernel. This function uses a fast Fourier transform and
 #'does the convolution in the frequency domain, so it should be faster for much larger kernels.
 #'
-#'@param image Image filename or 3-layer RGB array.
+#'@param image 3-layer RGB/4-layer RGBA array, `rayimg` class, or filename of an image.
 #'@param filename Default `NULL`. The filename of the image to be saved. If this is not given, the image will be plotted instead.
 #'@param kernel Default `gaussian`. By default, an 11x11 Gaussian kernel with a mean
 #'of `0` and a standard deviation of `1`, running from `-kernel_extent` to `kernel_extent`.
@@ -16,34 +16,23 @@
 #'@param kernel_extent Default `3`. Extent over which to calculate the kernel.
 #'@param absolute Default `TRUE`. Whether to take the absolute value of the convolution.
 #'@param pad Default `50`. Amount to pad the image to remove edge effects.
+#'@param include_alpha Default `FALSE`. Whether to include the alpha channel in the convolution.
 #'@param preview Default `FALSE`. Whether to plot the convolved image, or just to return the values.
-#'@param gamma_correction Default `FALSE`. Controls gamma correction when adding colors. Default exponent of 2.2.
-#'@return 3-layer RGB array of the processed image.
+#'@return A `rayimg` RGBA array.
 #'@export
-#'@examples
-#'if(run_documentation()){
+#'@examplesIf interactive() || identical(Sys.getenv("IN_PKGDOWN"), "true")
 #'#Perform a convolution with the default gaussian kernel
 #'plot_image(dragon)
-#'}
-#'if(run_documentation()){
 #'#Perform a convolution with the default gaussian kernel
-#'render_convolution_fft(dragon, kernel=0.1,preview = TRUE)
-#'}
-#'if(run_documentation()){
+#'render_convolution_fft(dragon, kernel=0.1, preview = TRUE)
 #'#Increase the width of the kernel
 #'render_convolution_fft(dragon, kernel = 2, kernel_dim=21,kernel_extent=6, preview = TRUE)
-#'}
-#'if(run_documentation()){
 #'#Use a built-in kernel:
 #'render_convolution_fft(dragon, kernel = generate_2d_exponential(falloff=2, dim=31, width=21),
 #'                       preview = TRUE)
-#'}
-#'if(run_documentation()){
 #'#Perform edge detection
 #'edge = matrix(c(-1,-1,-1,-1,8,-1,-1,-1,-1),3,3)
 #'render_convolution_fft(render_bw(dragon), kernel = edge, preview = TRUE)
-#'}
-#'if(run_documentation()){
 #'#Perform edge detection with Sobel matrices
 #'sobel1 = matrix(c(1,2,1,0,0,0,-1,-2,-1),3,3)
 #'sobel2 = matrix(c(1,2,1,0,0,0,-1,-2,-1),3,3,byrow=TRUE)
@@ -53,119 +42,143 @@
 #'plot_image(sob1)
 #'plot_image(sob2)
 #'plot_image(sob_all)
-#'}
-#'if(run_documentation()){
 #'#We can also apply this function to matrices:
 #'volcano |> image()
 #'volcano |>
 #'  render_convolution_fft(kernel=generate_2d_gaussian(sd=1,dim=31)) |>
 #'  image()
-#'}
-#'if(run_documentation()){
-#'# Because this function uses the fast-fourier transform, large kernels will be much faster
-#'# than the same size kernels in `render_convolution()`
+#'# Because this function uses the fast Fourier transform, large kernels will be much faster
+#'# than the same size kernels in [render_convolution()]
 #' render_convolution_fft(dragon, kernel_dim = c(200,200) , preview = TRUE)
-#'}
-#'if(run_documentation()){
 #'#Use a custom kernel (in this case, an X shape):
 #'custom = diag(10) + (diag(10)[,10:1])
 #'#Normalize
 #'custom = custom / 20
 #'plot_image(custom*20)
 #'render_convolution_fft(dragon, kernel = custom, preview = TRUE)
-#'}
-render_convolution_fft = function(image, kernel = "gaussian",
-                                  kernel_dim = c(11, 11),
-                                  kernel_extent = 3, absolute = TRUE, pad = 50,
-                                  filename=NULL, preview=FALSE,
-                                  gamma_correction = FALSE) {
+render_convolution_fft = function(
+  image,
+  kernel = "gaussian",
+  kernel_dim = c(11, 11),
+  kernel_extent = 3,
+  absolute = TRUE,
+  pad = 50,
+  include_alpha = FALSE,
+  filename = NULL,
+  preview = FALSE
+) {
   shift_fft = function(fft_mat) {
     nr = dim(fft_mat)[1]
     nc = dim(fft_mat)[2]
-    if(nr %% 2 == 0) {
-      nr_mid1 = nr/2
-      nr_mid2 = nr/2+1
+    if (nr %% 2 == 0) {
+      nr_mid1 = nr / 2
+      nr_mid2 = nr / 2 + 1
     } else {
-      nr_mid1 = floor(nr/2)
-      nr_mid2 = floor(nr/2)+1
+      nr_mid1 = floor(nr / 2)
+      nr_mid2 = floor(nr / 2) + 1
     }
-    if(nc %% 2 == 0) {
-      nc_mid1 = nc/2
-      nc_mid2 = nc/2+1
+    if (nc %% 2 == 0) {
+      nc_mid1 = nc / 2
+      nc_mid2 = nc / 2 + 1
     } else {
-      nc_mid1 = floor(nc/2)
-      nc_mid2 = floor(nc/2)+1
+      nc_mid1 = floor(nc / 2)
+      nc_mid2 = floor(nc / 2) + 1
     }
     fftcorn_nw = fft_mat[1:nr_mid1, 1:nc_mid1]
     fftcorn_ne = fft_mat[1:nr_mid1, nc_mid2:nc]
     fftcorn_sw = fft_mat[nr_mid2:nr, 1:nc_mid1]
-    fftcorn_se = fft_mat[nr_mid2:nr,nc_mid2:nc]
-    rbind(cbind(fftcorn_se,fftcorn_sw), cbind(fftcorn_ne,fftcorn_nw))
+    fftcorn_se = fft_mat[nr_mid2:nr, nc_mid2:nc]
+    rbind(cbind(fftcorn_se, fftcorn_sw), cbind(fftcorn_ne, fftcorn_nw))
   }
-  if(!is.null(filename)) {
-    if(tools::file_ext(filename) != "png") {
-      filename = paste0(filename,".png")
+  temp_image = ray_read_image(
+    image,
+    convert_to_array = FALSE,
+    reset_camera_settings = TRUE
+  )
+  colorspace = attr(temp_image, "colorspace")
+  whitepoint = attr(temp_image, "white_current")
+
+  #Check if file or image before below:
+  if (is.character(kernel)) {
+    if (kernel == "gaussian") {
+      kernel = generate_2d_gaussian(1, 1, kernel_dim, kernel_extent)
     }
   }
-  temp_image = ray_read_image(image, convert_to_array = FALSE)
-
-  if(is.character(kernel)) {
-    if(kernel == "gaussian") {
-      kernel = generate_2d_gaussian(1,1,kernel_dim,kernel_extent)
-    }
-  }
-  if(is.numeric(kernel) && length(kernel) == 1) {
-    kernel = generate_2d_gaussian(kernel,1,kernel_dim,kernel_extent)
+  if (is.numeric(kernel) && length(kernel) == 1) {
+    kernel = generate_2d_gaussian(kernel, 1, kernel_dim, kernel_extent)
   }
 
-  if(any(dim(kernel)[1:2] != dim(temp_image)[1:2])) {
-    if(all(dim(kernel)[1:2] <= dim(temp_image)[1:2])) {
-      kernel = expand_to_fit(dim(temp_image)[1:2],kernel)
+  if (any(dim(kernel)[1:2] != dim(temp_image)[1:2])) {
+    if (all(dim(kernel)[1:2] <= dim(temp_image)[1:2])) {
+      kernel = expand_to_fit(dim(temp_image)[1:2], kernel)
     } else {
       stop("kernel can't have greater dimensions than image")
     }
   }
-  if(pad != 0) {
-    temp_image = add_multi_padding(temp_image,pad)
-    kernel = add_multi_padding(kernel,pad)
+  if (pad != 0) {
+    temp_image = add_multi_padding(temp_image, pad)
+    kernel = add_multi_padding(kernel, pad)
   }
 
-  if(any(dim(kernel) > dim(temp_image)[1:2]*2 + 1)) {
-    stop("kernel dimensions: ", paste0(dim(kernel),collapse="x"),
-         " must not be greater than 2x image dimensions: ", paste0(dim(temp_image)[1:2],collapse="x"),
-         ", plus one (here, ", paste0(dim(temp_image)[1:2]*2 + 1, collapse="x"),").")
+  if (any(dim(kernel) > dim(temp_image)[1:2] * 2 + 1)) {
+    stop(
+      "kernel dimensions: ",
+      paste0(dim(kernel), collapse = "x"),
+      " must not be greater than 2x image dimensions: ",
+      paste0(dim(temp_image)[1:2], collapse = "x"),
+      ", plus one (here, ",
+      paste0(dim(temp_image)[1:2] * 2 + 1, collapse = "x"),
+      ")."
+    )
   }
 
-  if(gamma_correction) {
-    temp_image = temp_image^2.2
-  }
   temp_fft = temp_image
-  if(length(dim(temp_image)) == 2) {
+  if (length(dim(temp_image)) == 2) {
     temp_fft = stats::fft(temp_image)
   } else if (length(dim(temp_image)) == 3) {
-    for(i in seq_len(dim(temp_image)[3])) {
-      temp_fft[,,i] = stats::fft(temp_image[,,i])
+    channels = dim(temp_image)[3]
+    if (!include_alpha && (channels == 2 || channels == 4)) {
+      max_channel = channels - 1
+    } else {
+      max_channel = channels
+    }
+    for (i in seq_len(max_channel)) {
+      temp_fft[,, i] = stats::fft(temp_image[,, i])
     }
   }
 
   kernal_fft = stats::fft(kernel)
   vals = Re(temp_fft)
-  if(length(dim(temp_fft)) == 3) {
-    for(i in 1:(dim(temp_image)[3])) {
-      vals[,,i] = shift_fft(Re(stats::fft(temp_fft[,,i] * kernal_fft, inverse = TRUE))/length(vals[,,i]))
+  if (length(dim(temp_fft)) == 3) {
+    channels = dim(temp_image)[3]
+    if (!include_alpha && (channels == 2 || channels == 4)) {
+      max_channel = channels - 1
+    } else {
+      max_channel = channels
+    }
+    for (i in seq_len(max_channel)) {
+      vals[,, i] = shift_fft(
+        Re(stats::fft(temp_fft[,, i] * kernal_fft, inverse = TRUE)) /
+          length(vals[,, i])
+      )
     }
   } else {
-    vals = shift_fft(Re(stats::fft(temp_fft * kernal_fft, inverse = TRUE))/length(vals))
+    vals = shift_fft(
+      Re(stats::fft(temp_fft * kernal_fft, inverse = TRUE)) / length(vals)
+    )
   }
-  if(absolute) {
+  if (absolute) {
     vals = abs(vals)
   }
 
-  if(gamma_correction) {
-    vals = vals ^ (1/2.2)
+  if (pad != 0) {
+    vals = trim_padding(vals, pad)
   }
-  if(pad != 0) {
-    vals = trim_padding(vals,pad)
-  }
-  handle_image_output(vals, filename = filename, preview = preview)
+  final_image = ray_read_image(
+    vals,
+    assume_colorspace = colorspace,
+    assume_white = whitepoint,
+    source_linear = TRUE
+  )
+  handle_image_output(final_image, filename = filename, preview = preview)
 }

@@ -4,14 +4,23 @@
 \alias{render_clamp}
 \title{Clamp Image}
 \usage{
-render_clamp(image, min_value = 0, max_value = 1, preview = FALSE, ...)
+render_clamp(
+  image,
+  min_value = 0,
+  max_value = 1,
+  filename = NA,
+  preview = FALSE,
+  ...
+)
 }
 \arguments{
-\item{image}{Image filename or 3-layer RGB array.}
+\item{image}{3-layer RGB/4-layer RGBA array, \code{rayimg} class, or filename of an image.}
 
-\item{min_value}{Default \code{0}. Minimum value to clamp the image to.}
+\item{min_value}{Default \code{0}. Minimum value to clamp the RGB channels in the image to.}
 
-\item{max_value}{Default \code{1}. Maximum value to clamp the image to.}
+\item{max_value}{Default \code{1}. Maximum value to clamp the RGB channels in the image to.}
+
+\item{filename}{Default \code{NA}. Filename}
 
 \item{preview}{Default \code{FALSE}. If \code{TRUE}, it will display the image in addition
 to returning it.}
@@ -19,19 +28,17 @@ to returning it.}
 \item{...}{Arguments to pass to either \code{jpeg::readJPEG}, \code{png::readPNG}, or \code{tiff::readTIFF}.}
 }
 \value{
-3-layer RGB array of the processed image.
+A \code{rayimg} RGBA array.
 }
 \description{
-Clamps an image to a user-specified range
+Clamps an image to a user-specified range, ignoring the alpha channel.
 }
 \examples{
-if(run_documentation()){
-#The rnage of the unchanged image
+\dontshow{if (interactive() || identical(Sys.getenv("IN_PKGDOWN"), "true")) withAutoprint(\{ # examplesIf}
+#The image of the unchanged image
 range(dragon)
-}
-if(run_documentation()){
 #Clamp the maximum and minimum values to one and zero
 render_clamp(dragon) |>
  range()
-}
+\dontshow{\}) # examplesIf}
 }

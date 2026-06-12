@@ -4,48 +4,47 @@
 \alias{ray_write_image}
 \title{Write Image}
 \usage{
-ray_write_image(image, filename, clamp = TRUE, ...)
+ray_write_image(image, filename, clamp = FALSE, write_linear = NA, ...)
 }
 \arguments{
-\item{image}{Image filename or 3-layer RGB array.}
+\item{image}{3-layer RGB/4-layer RGBA array, \code{rayimg} class, or filename of an image.}
 
 \item{filename}{File to write to, with filetype determined by extension. Filetype can be
-\code{PNG}, \code{JPEG}, or \code{TIFF}.}
+\code{PNG}, \code{JPEG}, \code{TIFF}, \code{EXR}, or \code{DNG}.}
 
-\item{clamp}{Default \code{TRUE}. Whether to clamp the image to 0-1. If the file extension is \code{PNG} of \code{JPEG},
+\item{clamp}{Default \code{FALSE}, automatically determined. Whether to clamp the image to 0-1. If the file extension is \code{PNG} of \code{JPEG},
 this is forced to \code{TRUE}.}
 
-\item{...}{Arguments to pass to either \code{jpeg::writeJPEG}, \code{png::writePNG}, or \code{tiff::writeTIFF}.}
+\item{write_linear}{Default \code{NA}, automatically determined. By default, images will be gamma corrected (write_linear = FALSE) for
+all file types except \code{EXR} and \code{DNG} (which are linear formats), unless otherwise specified.}
+
+\item{...}{Arguments to pass to either \code{jpeg::writeJPEG}, \code{png::writePNG}, \code{libopenexr::write_exr}, or \code{tiff::writeTIFF}.}
 }
 \value{
-3-layer RGB array of the processed image.
+A \code{rayimg} RGBA array.
 }
 \description{
 Takes an RGB array/filename and writes it to file.
 }
 \examples{
-if(run_documentation()){
+\dontshow{if (interactive() || identical(Sys.getenv("IN_PKGDOWN"), "true")) withAutoprint(\{ # examplesIf}
 #Write as a png
 tmparr = tempfile(fileext=".png")
 ray_read_image(dragon) |>
  ray_write_image(tmparr)
 ray_read_image(tmparr) |>
  plot_image()
-}
-if(run_documentation()){
 #Write as a JPEG (passing quality arguments via ...)
 tmparr = tempfile(fileext=".jpg")
 ray_read_image(dragon) |>
  ray_write_image(tmparr, quality = 0.2)
 ray_read_image(tmparr) |>
  plot_image()
-}
-if(run_documentation()){
 #Write as a tiff
 tmparr = tempfile(fileext=".tiff")
 ray_read_image(dragon) |>
  ray_write_image(tmparr)
 ray_read_image(tmparr) |>
   plot_image()
-}
+\dontshow{\}) # examplesIf}
 }

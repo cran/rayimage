@@ -2,7 +2,7 @@
 
 #include <RcppArmadillo.h>
 #include <RProgress.h>
-#include "stb_image_resize.h"
+#include <stbimageheaders/stb_image_resize2.h>
 // [[Rcpp::depends(RcppArmadillo)]]
 using namespace Rcpp;
 
@@ -98,8 +98,8 @@ NumericMatrix resize_matrix_stb(NumericMatrix image, int width, int height, int 
   float* resized_image = new float[width * height];
   float* original_image = new float[image.ncol() * image.nrow()];
 
-  for(unsigned int i = 0; i < image.nrow(); i++ ) {
-    for(unsigned int j = 0; j < image.ncol(); j++) {
+  for(int i = 0; i < image.nrow(); i++ ) {
+    for(int j = 0; j < image.ncol(); j++) {
       original_image[i + image.nrow() * j] = image(i,j);
     }
   }
@@ -127,9 +127,16 @@ NumericMatrix resize_matrix_stb(NumericMatrix image, int width, int height, int 
     interp_type = STBIR_FILTER_MITCHELL;
   }
 
-  stbir_resize_float_generic(original_image, image.nrow(), image.ncol(), 0,
-                             resized_image, width, height, 0,
-                             1, 0, 0, STBIR_EDGE_WRAP, interp_type, STBIR_COLORSPACE_LINEAR, NULL);
+  void* resized = stbir_resize(
+    original_image, image.nrow(), image.ncol(), 0,
+    resized_image, width, height, 0,
+    STBIR_1CHANNEL, STBIR_TYPE_FLOAT,
+    STBIR_EDGE_WRAP, interp_type);
+  if (resized == nullptr) {
+    delete[] resized_image;
+    delete[] original_image;
+    stop("stb image resize failed.");
+  }
   NumericMatrix resized_mat(width,height);
   for(int i = 0; i < width; i++ ) {
     for(int j = 0; j < height; j++) {
@@ -161,8 +168,8 @@ arma::mat generate_disk(float radius, int dim, bool offsetx, bool offsety) {
   if(offsety) {
     y -= radius/dim + radius/dim/8;
   }
-  for(int i = 0; i < testmat.n_rows; i++) {
-    for(int j = 0; j < testmat.n_cols; j++) {
+  for(arma::uword i = 0; i < testmat.n_rows; i++) {
+    for(arma::uword j = 0; j < testmat.n_cols; j++) {
       testmat(i,j) = fabs(evaluate_disk(pow(x[i],2.0) + pow(y[j],2.0)));
     }
   }

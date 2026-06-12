@@ -24,7 +24,7 @@ render_title(
 )
 }
 \arguments{
-\item{image}{Image filename or 3-layer RGB array. Specifies the image to process.}
+\item{image}{3-layer RGB/4-layer RGBA array, \code{rayimg} class, or filename of an image.}
 
 \item{title_text}{Default \code{""}. Text string to be added as the title to the image.}
 
@@ -81,42 +81,30 @@ planned for deprecation. It is recommended to use the \code{grid}-based method f
 future compatibility.
 }
 \examples{
-if(run_documentation()){
+\dontshow{if (interactive() || identical(Sys.getenv("IN_PKGDOWN"), "true")) withAutoprint(\{ # examplesIf}
 #Plot the dragon
 render_title(dragon, preview = TRUE, title_text = "Dragon", title_size=20)
-}
-if(run_documentation()){
 #That's hard to see--let's add a title bar:
 render_title(dragon, preview = TRUE, title_text = "Dragon", title_size=20,
          title_bar_color="white")
-}
-if(run_documentation()){
 #Change the width of the bar:
 render_title(dragon, preview = TRUE, title_text = "Dragon", title_size=20,
          title_bar_color="white", title_offset = c(8,8))
-}
-if(run_documentation()){
 #The width of the bar will also automatically adjust for newlines:
 render_title(dragon, preview = TRUE, title_text = "Dragon\n(Blue)", title_size=20,
          title_bar_color="white")
-}
-if(run_documentation()){
 #Change the color and title color:
 render_title(dragon, preview = TRUE, title_text = "Dragon", title_size=20,
          title_bar_color="red", title_color = "white")
-}
-if(run_documentation()){
 #Change the transparency:
 render_title(dragon, preview = TRUE, title_text = "Dragon",
             title_size=20, title_bar_alpha = 0.8,
             title_bar_color="red", title_color = "white")
-}
-if(run_documentation()){
 #Read directly from a file
 temp_image = tempfile(fileext = ".png")
 ray_write_image(dragon, temp_image)
 render_title(temp_image, preview = TRUE, title_text = "Dragon",
              title_size=20, title_bar_alpha = 0.8,
              title_bar_color="red", title_color = "white")
-}
+\dontshow{\}) # examplesIf}
 }
